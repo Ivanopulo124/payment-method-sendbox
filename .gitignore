@@ -1,0 +1,10 @@
+configs/envs/local
+.fleet/*
+.vscode/
+.idea/
+.zed/
+.DS_Store
+cmd/__debug_bin*
+/log/
+/vendor/
+cmd/__debug_bin*
