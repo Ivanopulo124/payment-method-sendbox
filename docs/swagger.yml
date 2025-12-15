@@ -1,0 +1,509 @@
+openapi: 3.0.0
+info:
+  title: Abstract Payment API
+  description: A sandbox REST API for payment processing built with Go and Gin
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new account
+      description: Creates a new user account with provided credentials
+      operationId: registerAccount
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "200":
+          description: Account successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Account already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payment/create:
+    post:
+      summary: Register a new payment
+      description: Creates a new payment transaction with specified parameters
+      operationId: createPayment
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "201":
+          description: Payment successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+        "400":
+          description: Invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication failed (invalid login or password)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payment/status:
+    post:
+      summary: Get payment status
+      description: Retrieve the current status of a payment transaction
+      operationId: getPaymentStatus
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetPaymentStatusRequest"
+      responses:
+        "200":
+          description: Payment status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+        "400":
+          description: Invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication failed (invalid login or password)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payment/cancel:
+    post:
+      summary: Cancel a payment
+      description: Cancels an existing payment transaction
+      operationId: cancelPayment
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentActionRequest"
+      responses:
+        "200":
+          description: Payment successfully cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication failed (invalid login or password)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Cannot cancel payment in current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payment/capture:
+    post:
+      summary: Capture payment funds
+      description: Captures (finalizes) funds for a two-stage payment transaction
+      operationId: capturePayment
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentActionRequest"
+      responses:
+        "200":
+          description: Funds successfully captured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication failed (invalid login or password)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Cannot capture payment in current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payment/refund:
+    post:
+      summary: Refund payment funds
+      description: Performs a partial refund on a payment transaction
+      operationId: refundPayment
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefundPaymentRequest"
+      responses:
+        "200":
+          description: Refund successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication failed (invalid login or password)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Cannot refund payment in current state or insufficient funds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          description: User login
+          minLength: 1
+          example: john_doe
+        password:
+          type: string
+          description: User password
+          minLength: 1
+          example: secure_password_123
+      additionalProperties: false
+
+    CreatePaymentRequest:
+      type: object
+      required:
+        - login
+        - password
+        - amount
+        - order_number
+        - two_stage
+      properties:
+        login:
+          type: string
+          description: User login
+          minLength: 1
+          example: john_doe
+        password:
+          type: string
+          description: User password
+          minLength: 1
+          example: secure_password_123
+        amount:
+          type: number
+          format: float
+          description: Payment amount
+          minimum: 0.01
+          example: 99.99
+        order_number:
+          type: string
+          description: Unique order number
+          minLength: 1
+          example: ORD-2025-001
+        two_stage:
+          type: boolean
+          description: Whether this is a two-stage payment (capture required) or one-stage
+          example: false
+      additionalProperties: false
+
+    GetPaymentStatusRequest:
+      type: object
+      required:
+        - login
+        - password
+        - payment_number
+      properties:
+        login:
+          type: string
+          description: User login
+          minLength: 1
+          example: john_doe
+        password:
+          type: string
+          description: User password
+          minLength: 1
+          example: secure_password_123
+        payment_number:
+          type: string
+          description: Payment identifier
+          minLength: 1
+          example: PAY-2025-001
+      additionalProperties: false
+
+    PaymentActionRequest:
+      type: object
+      required:
+        - login
+        - password
+        - payment_number
+      properties:
+        login:
+          type: string
+          description: User login
+          minLength: 1
+          example: john_doe
+        password:
+          type: string
+          description: User password
+          minLength: 1
+          example: secure_password_123
+        payment_number:
+          type: string
+          description: Payment identifier
+          minLength: 1
+          example: PAY-2025-001
+      additionalProperties: false
+
+    RefundPaymentRequest:
+      type: object
+      required:
+        - login
+        - password
+        - payment_number
+        - refund_amount
+      properties:
+        login:
+          type: string
+          description: User login
+          minLength: 1
+          example: john_doe
+        password:
+          type: string
+          description: User password
+          minLength: 1
+          example: secure_password_123
+        payment_number:
+          type: string
+          description: Payment identifier
+          minLength: 1
+          example: PAY-2025-001
+        refund_amount:
+          type: number
+          format: float
+          description: Amount to refund
+          minimum: 0.01
+          example: 50.00
+      additionalProperties: false
+
+    PaymentObject:
+      type: object
+      required:
+        - order_number
+        - payment_number
+        - status
+        - amount
+        - created_at
+        - payment_url
+        - payment_token
+      properties:
+        order_number:
+          type: string
+          description: Associated order number
+          example: ORD-2025-001
+        payment_number:
+          type: string
+          description: Unique payment identifier
+          example: PAY-2025-001
+        status:
+          type: string
+          enum:
+            - pending_payment
+            - paid
+            - captured
+            - canceled
+          description: Current payment status
+          example: pending_payment
+        amount:
+          type: number
+          format: float
+          description: Payment amount
+          example: 99.99
+        created_at:
+          type: string
+          format: date-time
+          description: Payment creation timestamp (ISO 8601)
+          example: "2025-12-15T11:54:00Z"
+        payment_url:
+          type: string
+          format: uri
+          description: URL for completing the payment
+          example: https://payment.example.com/pay/PAY-2025-001
+        payment_token:
+          type: string
+          description: Unique payment token for security
+          example: tok_1234567890abcdefghijk
+      additionalProperties: false
+
+    SuccessResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          example: true
+      additionalProperties: false
+
+    PaymentResponse:
+      type: object
+      required:
+        - payment
+      properties:
+        payment:
+          $ref: "#/components/schemas/PaymentObject"
+      additionalProperties: false
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code identifier
+          example: INVALID_CREDENTIALS
+        message:
+          type: string
+          description: Human-readable error message
+          example: Invalid login or password
+      additionalProperties: false
