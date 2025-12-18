@@ -18,8 +18,8 @@ func RegisterRoutes(r *gin.Engine) {
 	payment.POST("/create", Create)
 	payment.POST("/status", GetStatus)
 	payment.POST("/cancel", Cancel)
-	payment.POST("/capture", Cancel)
-	payment.POST("/refund", Cancel)
+	payment.POST("/capture", Capture)
+	payment.POST("/refund", Refund)
 
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "pong")
